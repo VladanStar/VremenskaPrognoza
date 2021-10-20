@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.3.min.js"></script>
+
+    <style>
+        /*
+table,
+th,
+td {
+border: 1px solid black;
+border-collapse: collapse;
+padding: 10px;
+}
+*/
+    </style>
+
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1>Vremenska Prognoza</h1>
+
+                <select class="form-control" id="city">
+                    <option>Izaberi Grad</option>
+                    <option value="Kragujevac">Kragujevac</option>
+                    <option value="Beograd">Beograd</option>
+                    <option value="Novi Sad">Novi Sad</option>
+                    <option value="Nis">Nis</option>
+                    <option value="Kraljevo">Kraljevo</option>
+                    <option value="Subotica">Subotica</option>
+                    <option value="Cacak">Cacak</option>
+                </select>
+
+                <select class="form-control" id="izaberiJedinicu">
+                    <option value="">Kelvin</option>
+                    <option value="metric">Celsius</option>
+                    <option value="imperial">Fahrenheit</option>
+                </select>
+
+                <button id="prikaziPrognozu" class="btn btn-success">Prkazi</button>
+
+
+            </div>
+
+            <div class="col-sm-12 row" id="prognoza">
+
+            </div>
+
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            i = 1;
+            $("#prikaziPrognozu").click(function () {
+                grad = $('#city').val();
+                jedinica = $('#izaberiJedinicu').val();
+                document.getElementById("prognoza").innerHTML = "";
+
+                $.ajax({
+                    url: "https://api.openweathermap.org/data/2.5/forecast/daily?q=" + grad + "&units=" + jedinica + "&cnt=7&mode=json&appid=1b1d0ad1ab386b48e8311d1e61b27554",
+                    dataType: "json",
+                    success: function (data) {
+                        for (const key in data.list) {
+                            const element = data.list[key];
+                            showWeather(element, grad);
+                        }
+
+                    }
+                })
+
+            })
+        })
+
+        let i = 1;
+        function showWeather(data, city) {
+
+
+            prognoza = document.getElementById("prognoza");
+            div = document.createElement("div");
+            div.setAttribute("class", "col-sm-3");
+
+            h2 = document.createElement("h2");
+            h2.setAttribute("class", "dan");
+            h2.innerHTML =   "Dan " + i;
+           
+            div.appendChild(h2);
+
+            h5 = document.createElement("h5");
+            h5.setAttribute("class", "temperatura");
+            h5.innerHTML = "Temperatura " + data.temp.day;
+            div.appendChild(h5);
+
+            hiddenDiv =  document.createElement("div");
+            hiddenDiv.setAttribute("class", "hidden");
+            hiddenDiv.setAttribute("id", "hidden"+i);
+
+            minTemp = document.createElement("h6");
+            minTemp.innerHTML = "Min " + data.temp.min;
+
+            hiddenDiv.appendChild(minTemp);
+
+            maxTemp = document.createElement("h6");
+            maxTemp.innerHTML = "Max " + data.temp.max;
+
+            hiddenDiv.appendChild(maxTemp);
+
+            dugme = document.createElement("button");
+            dugme.setAttribute("class", "btn btn-info");
+            dugme.setAttribute("id", "btn" + i);
+            dugme.setAttribute("value", i);
+            dugme.innerHTML = "Vise/Manje Informacija"
+            div.appendChild(hiddenDiv);
+            div.appendChild(dugme);
+            prognoza.appendChild(div);
+            document.getElementById("btn" + i).
+                addEventListener("click",
+                    // fji se prosledjuje event klika koji u sebi sadrzi informacije o objektu koji je kliknut
+                    // u uvom slucaju objekat je  <button value ='11.000' id='button0'>Kupi</button>
+                    // u target se nalazi taj objekat a nama treba njegova vrednsot value, sto prosledjujemo u fju saberi
+                    function (event) {
+                        toogleIt(event.target.value);
+                    });
+
+           
+                    i++;
+
+
+           
+
+        }
+
+    
+        function toogleIt(value) {
+            $('#hidden'+ value).toggle();
+        }
+
+
+    </script>
+
+</body>
+
+
+</html>
